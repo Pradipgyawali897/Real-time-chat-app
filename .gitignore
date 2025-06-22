@@ -10,4 +10,4 @@
 *.sig
 
 pkg/
-src/
+local_cdn
