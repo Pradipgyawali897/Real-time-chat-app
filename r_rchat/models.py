@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 class ChatGroup(models.Model):
     group_name=models.CharField(max_length=50,unique=True)
+    user_online=models.ManyToManyField(User,blank=True)
     
     def __str__(self):
         return self.group_name
