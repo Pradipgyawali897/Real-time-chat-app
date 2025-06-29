@@ -1,3 +1,4 @@
+<!-- r_chat/templates/r_chat/chat.html -->
 {% extends 'layouts/blank.html' %}
 
 {% load static %}
@@ -5,7 +6,8 @@
 
 {% block content %}
 <div class="h-screen flex bg-gray-900">
-    <div class="w-80 bg-gray-800 border-r border-gray-700 flex flex-col">
+    <!-- Left Sidebar -->
+    <div class="w-64 min-w-[16rem] bg-gray-800 border-r border-gray-700 flex flex-col">
         {% include "r_chat/partials/groups_sidebar.html" %}
     </div>
     
@@ -15,10 +17,14 @@
         <div class="bg-gray-800 border-b border-gray-700 p-4 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <div class="w-3 h-3 bg-green-400 rounded-full"></div>
-                <h2 class="text-white font-semibold text-lg">Public Chat</h2>
-                <span class="text-gray-400 text-sm">{% include "r_chat/partials/online_count.html" %}</span>
+                <h2 class="text-white font-semibold text-lg">
+                    {% if group %}{{ group.group_name }}{% else %}Public Chat{% endif %}
+                </h2>
+                <span id="online-count-container" class="text-gray-400 text-sm">
+                    {% include "r_chat/partials/online_count.html" with online_count=0 %}
+                </span>
             </div>
-            <button class="text-gray-400 hover:text-white transition-colors">
+            <button class="text-gray-400 hover:text-white transition-colors" aria-label="Chat options">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
                 </svg>
@@ -26,19 +32,19 @@
         </div>
         
         <!-- Chat Messages -->
-        <div id='chat_container' class="flex-1 overflow-y-auto bg-gray-900">
-            <ul id='chat_messages' class="flex flex-col gap-2 p-4">
+        <div id="chat_container" class="flex-1 overflow-y-auto bg-gray-900 p-4">
+            <ul id="chat_messages" class="flex flex-col gap-4">
                 {% for message in messages reversed %}
-                    {% include "r_chat/chat_message.html" %}
+                    {% include "r_chat/chat_message.html" with message=message user=user %}
                 {% endfor %}
             </ul>
         </div>
         
-        <!-- Message Input -->
+        <!-- Chat Input Form -->
         <div class="bg-gray-800 border-t border-gray-700 p-4">
             <form id="chat_message_form" class="flex items-center space-x-3"
                   hx-ext="ws"
-                  ws-connect="/ws/chatroom/public_chat/"
+                  ws-connect="/ws/chat/{% if group %}{{ group.group_name }}{% else %}public_chat{% endif %}/"
                   ws-send
                   _="on htmx:wsAfterSend reset() me">
                 {% csrf_token %}
@@ -56,8 +62,8 @@
     </div>
     
     <!-- Right Sidebar - Online Users -->
-    <div class="w-80 bg-gray-800 border-l border-gray-700 flex flex-col">
-        {% include "r_chat/partials/online_users.html" %}
+    <div id="online-users-container" class="w-64 min-w-[16rem] bg-gray-800 border-l border-gray-700 flex flex-col">
+        {% include "r_chat/partials/online_users.html" with users=group.online_users.all %}
     </div>
 </div>
 {% endblock %}
@@ -71,10 +77,25 @@
         }, time);
     }
     scrollToBottom();
-    
+
     // Auto-scroll on new messages
-    document.addEventListener('htmx:wsAfterMessage', function() {
+    document.addEventListener('htmx:wsAfterMessage', function(event) {
+        console.log('HTMX WebSocket message:', event.detail.message);
         scrollToBottom(100);
+    });
+
+    // Client-side search for online users
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.querySelector('input[placeholder="Search users..."]');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const search = e.target.value.toLowerCase();
+                document.querySelectorAll('.flex.items-center.space-x-3').forEach(user => {
+                    const username = user.querySelector('p.text-white').textContent.toLowerCase();
+                    user.style.display = username.includes(search) ? '' : 'none';
+                });
+            });
+        }
     });
 </script>
 {% endblock %}
