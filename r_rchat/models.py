@@ -4,10 +4,13 @@ from django.contrib.auth.models import User
 
 class ChatGroup(models.Model):
     group_name=models.CharField(max_length=50,unique=True)
-    user_online=models.ManyToManyField(User,blank=True)
-    
+    user_online=models.ManyToManyField(User,blank=True,related_name="Online_members")
+    chat_member=models.ManyToManyField(User,blank=True,related_name="Group_members")
+    moderator=models.ManyToManyField(User,related_name="Moderator")
+    picture=models.ImageField(upload_to="storage/group/photo",blank=True)
     def __str__(self):
         return self.group_name
+    
     
 class GroupMessages(models.Model):
     group=models.ForeignKey(ChatGroup,on_delete=models.CASCADE)
@@ -28,6 +31,7 @@ class Privatemessage(GroupMessages):
     friend=models.ForeignKey(Friends,on_delete=models.CASCADE)
     def __str__(self):
         return f"{self.friend} \t {self.body}"
+    
     
 
     

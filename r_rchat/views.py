@@ -1,6 +1,8 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from .models import GroupMessages,ChatGroup
-from .forms import CreateMessage
+from .forms import CreateMessage,CreateGroup,Friends
+
+
 def chat_view(request):
     chat_group=get_object_or_404(ChatGroup,group_name='public_chat')
     messages=GroupMessages.objects.all()[:30]
@@ -19,5 +21,20 @@ def chat_view(request):
             }
         return render(request,"r_chat/partials/chat_messages_p.html",context)
     return render(request,"r_chat/chat.html",context={'messages':messages,"form":form})
+
+
+def create_group(request):
+    form=CreateGroup()
+    if request.method=='POST':
+        form=CreateGroup(request.POST)
+        if form.is_valid:
+            form.save()
+            return redirect('/')
+    return render(request,'r_chat/partials/group_form_modal.html',context={'form':form})
+
+def show_friends(request):
+    friends=Friends.objects.all()[:12]
+    return render(request,'r_chat/chat.html',context={"friends":friends})
+
 
 

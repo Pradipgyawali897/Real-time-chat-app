@@ -1,0 +1,17 @@
+<!-- Friends Sidebar -->
+<div class="w-80 bg-gray-800 border-r border-gray-700 flex flex-col">
+  <div class="text-white text-xl font-semibold px-4 py-3 border-b border-gray-700">
+    Friends
+  </div>
+  <ul class="overflow-y-auto flex-1">
+    {% for friend in friends %}
+      <li class="px-4 py-2 hover:bg-gray-700 border-b border-gray-700">
+        <a href="{% url 'chat_with_friend' friend.username %}" class="text-white block">
+          {{ friend.username }}
+        </a>
+      </li>
+    {% empty %}
+      <li class="px-4 py-2 text-gray-400">No friends found.</li>
+    {% endfor %}
+  </ul>
+</div>
