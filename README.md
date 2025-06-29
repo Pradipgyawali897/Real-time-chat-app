@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-#### Video Tutorial for this project
-https://youtu.be/SQ4A7Q6_md8
-<br><br>
+
 
 #### Getting the files
 Download zip file<br> 
@@ -61,6 +58,8 @@ exit()
 ```
 
 
+
+###Repo is under construction
 =======
 The repo is under construction
 >>>>>>> d731799e168f3ca65aaadbd1bdedc6fd690e4be3
