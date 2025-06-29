@@ -19,3 +19,5 @@ def chat_view(request):
             }
         return render(request,"r_chat/partials/chat_messages_p.html",context)
     return render(request,"r_chat/chat.html",context={'messages':messages,"form":form})
+
+

@@ -58,7 +58,7 @@ class ChatRoomConsumer(WebsocketConsumer):
             print("Error in message_handler:", e)
 
     def update_online_count(self):
-        online_count = self.chatroom.user_online.count() 
+        online_count = self.chatroom.user_online.count() -1
         event = {
             'type': 'online_count_handler',
             'online_count': online_count

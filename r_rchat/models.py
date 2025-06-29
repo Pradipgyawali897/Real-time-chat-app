@@ -18,3 +18,16 @@ class GroupMessages(models.Model):
         return f"{self.group} \t {self.body}"
     class Meta:
         ordering = ['-created']
+
+class Friends(models.Model):
+    user_friends=models.ManyToManyField(User)
+    def __str__(self):
+        return f"{self.friend} \t {self.message}"
+    
+class Privatemessage(GroupMessages):
+    friend=models.ForeignKey(Friends,on_delete=models.CASCADE)
+    def __str__(self):
+        return f"{self.friend} \t {self.body}"
+    
+
+    

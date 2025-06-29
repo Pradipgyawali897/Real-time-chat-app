@@ -1,35 +1,77 @@
+<!-- r_chat/chat_message.html -->
 {% if message.author == user %}
-                <li class="flex justify-end mb-4">
-                    <div class="bg-green-200 rounded-l-lg rounded-tr-lg p-4 max-w-[75%]">
-                        <span>{{message.body}}</span>
-                    </div>
-                    <div class="flex items-end">
-                        <svg height="13" width="8" >
-                            <path fill="#bbf7d0" d="M6.3,10.4C1.5,8.7,0.9,5.5,0,0.2L0,13l5.2,0C7,13,9.6,11.5,6.3,10.4z"/>
-                        </svg>
-                    </div>
-                </li>
-                {% else %}
-                <li>
-                    <div class="flex justify-start">
-                        <div class="flex items-end mr-2" >
-                            <a href="{% url "profile" message.author.username %}">
-                                <img class="w-8 h-8 rounded-full object-cover" src="{{message.author.profile.avatar}}">
-                            </a>
+    <!-- Your own message (right side) -->
+    <li class="flex justify-end mb-4 group hover:bg-gray-800/30 rounded-lg p-2 transition-colors">
+        <div class="flex flex-col items-end max-w-[75%]">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-l-lg rounded-tr-lg p-4 shadow-lg">
+                <span class="text-sm leading-relaxed break-words">{{ message.body }}</span>
+            </div>
+            <div class="flex items-center space-x-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span class="text-gray-400 text-xs">
+                    {{ message.timestamp|default:"now"|date:"H:i" }}
+                </span>
+                <button class="text-gray-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-gray-700 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="flex items-end ml-2">
+            <svg height="13" width="8">
+                <path fill="#3b82f6" d="M6.3,10.4C1.5,8.7,0.9,5.5,0,0.2L0,13l5.2,0C7,13,9.6,11.5,6.3,10.4z"/>
+            </svg>
+        </div>
+    </li>
+{% else %}
+    <!-- Other user's message (left side) -->
+    <li class="mb-4 group hover:bg-gray-800/30 rounded-lg p-2 transition-colors">
+        <div class="flex justify-start">
+            <div class="flex items-end mr-2">
+                <a href="{% url 'profile' message.author.username %}">
+                    {% if message.author.profile.avatar %}
+                        <img class="w-8 h-8 rounded-full object-cover border-2 border-gray-600" 
+                             src="{{ message.author.profile.avatar }}" 
+                             alt="{{ message.author.username }}">
+                    {% else %}
+                        <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center border-2 border-gray-600">
+                            <span class="text-white font-medium text-xs">
+                                {{ message.author.username|first|upper }}
+                            </span>
                         </div>
-                        <div class="flex items-end" >
-                            <svg height="13" width="8" >
-                                <path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
-                            </svg>
-                        </div>
-                        <div class="bg-white p-4 max-w-[75%] rounded-r-lg rounded-tl-lg">
-                            <span>{{message.body}}</span>
-                        </div>  
-                    </div>
-                    <div class="text-sm font-light py-1 ml-10">
-                        <span class="text-white">{{message.author.profile.name}}</span> 
-                        <span class="text-gray-400">@{{message.author.username}}</span>
-                    </div>
-                </li>
-                {% endif %}
-                
+                    {% endif %}
+                </a>
+            </div>
+            <div class="flex items-end">
+                <svg height="13" width="8">
+                    <path fill="#374151" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
+                </svg>
+            </div>
+            <div class="bg-gray-700 text-white p-4 max-w-[75%] rounded-r-lg rounded-tl-lg shadow-lg">
+                <span class="text-sm leading-relaxed break-words">{{ message.body }}</span>
+            </div>
+        </div>
+        <div class="flex items-center justify-between ml-10 mt-1">
+            <div class="text-sm font-light">
+                <span class="text-white font-medium">{{ message.author.profile.name|default:message.author.username }}</span>
+                <span class="text-gray-400 ml-2">@{{ message.author.username }}</span>
+                <span class="text-gray-500 text-xs ml-2">
+                    {{ message.timestamp|default:"now"|date:"H:i" }}
+                </span>
+            </div>
+            <!-- Message Actions -->
+            <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button class="text-gray-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-gray-600 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                </button>
+                <button class="text-gray-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-gray-600 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </li>
+{% endif %}

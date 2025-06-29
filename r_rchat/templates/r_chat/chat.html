@@ -1,45 +1,80 @@
 {% extends 'layouts/blank.html' %}
 
-{% block content %} 
-<wrapper class="block max-w-2xl mx-auto my-10 px-6">
-    <div id="chat_window" class="h-[45rem] flex flex-col bg-gray-800 rounded-2xl shadow-2xl relative p-1">
-        <div class="flex justify-center text-emerald-400 bg-gray-800 p-2 sticky top-0 z-10">
-            {% include "r_chat/partials/online_count.html" %}
+{% load static %}
+{% load django_htmx %}
+
+{% block content %}
+<div class="h-screen flex bg-gray-900">
+    <div class="w-80 bg-gray-800 border-r border-gray-700 flex flex-col">
+        {% include "r_chat/partials/groups_sidebar.html" %}
+    </div>
+    
+    <!-- Main Chat Area -->
+    <div class="flex-1 flex flex-col">
+        <!-- Chat Header -->
+        <div class="bg-gray-800 border-b border-gray-700 p-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                <h2 class="text-white font-semibold text-lg">Public Chat</h2>
+                <span class="text-gray-400 text-sm">{% include "r_chat/partials/online_count.html" %}</span>
+            </div>
+            <button class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                </svg>
+            </button>
         </div>
-        <div id='chat_container' class="overflow-y-auto grow">
-            <ul id='chat_messages' class="flex flex-col justify-end gap-2 p-4">
-                {% for message in messages  reversed%}
-                {% include "r_chat/chat_message.html" %}
+        
+        <!-- Chat Messages -->
+        <div id='chat_container' class="flex-1 overflow-y-auto bg-gray-900">
+            <ul id='chat_messages' class="flex flex-col gap-2 p-4">
+                {% for message in messages reversed %}
+                    {% include "r_chat/chat_message.html" %}
                 {% endfor %}
             </ul>
         </div>
-        <div class="sticky bottom-0 z-10 p-2 bg-gray-800">
-            <div class="flex items-center rounded-xl px-2 py-2">
-              <form id="chat_message_form" class="w-full"
-                    hx-ext="ws"
-                    ws-connect="/ws/chatroom/public_chat/"
-                    ws-send 
-                    _="on htmx:wsAfterSend reset() me">
-
-                    {% csrf_token %}
-                    {{form}}
-                </form>
-            </div>
+        
+        <!-- Message Input -->
+        <div class="bg-gray-800 border-t border-gray-700 p-4">
+            <form id="chat_message_form" class="flex items-center space-x-3"
+                  hx-ext="ws"
+                  ws-connect="/ws/chatroom/public_chat/"
+                  ws-send
+                  _="on htmx:wsAfterSend reset() me">
+                {% csrf_token %}
+                <div class="flex-1">
+                    {{ form }}
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                    <span>Send</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                </button>
+            </form>
         </div>
     </div>
-</wrapper>
+    
+    <!-- Right Sidebar - Online Users -->
+    <div class="w-80 bg-gray-800 border-l border-gray-700 flex flex-col">
+        {% include "r_chat/partials/online_users.html" %}
+    </div>
+</div>
 {% endblock %}
 
 {% block javascript %}
 <script>
-
     function scrollToBottom(time=0) {
         setTimeout(function() {
             const container = document.getElementById('chat_container');
             container.scrollTop = container.scrollHeight;
         }, time);
     }
-    scrollToBottom()
-
+    scrollToBottom();
+    
+    // Auto-scroll on new messages
+    document.addEventListener('htmx:wsAfterMessage', function() {
+        scrollToBottom(100);
+    });
 </script>
 {% endblock %}

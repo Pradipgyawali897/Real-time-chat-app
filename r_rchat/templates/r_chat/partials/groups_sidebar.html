@@ -1,0 +1,111 @@
+<!-- r_chat/partials/groups_sidebar.html -->
+<div class="flex flex-col h-full">
+    <!-- Header -->
+    <div class="p-4 border-b border-gray-700">
+        <h3 class="text-white font-semibold text-lg mb-3">Chat Groups</h3>
+        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            <span>New Group</span>
+        </button>
+    </div>
+    
+    <!-- Groups List -->
+    <div class="flex-1 overflow-y-auto p-2">
+        <div class="space-y-1">
+            <!-- Active Group -->
+            <div class="bg-blue-600 text-white p-3 rounded-lg cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-blue-700 rounded-full flex items-center justify-center">
+                            <span class="text-sm font-medium">#</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium">Public Chat</h4>
+                            <p class="text-xs text-blue-100">234 members</p>
+                        </div>
+                    </div>
+                    <div class="w-2 h-2 bg-red-400 rounded-full"></div>
+                </div>
+            </div>
+            
+            <!-- Other Groups -->
+            <div class="text-gray-300 hover:bg-gray-700 p-3 rounded-lg cursor-pointer transition-colors">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                            <span class="text-sm font-medium">D</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium">Development</h4>
+                            <p class="text-xs text-gray-400">45 members</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-gray-300 hover:bg-gray-700 p-3 rounded-lg cursor-pointer transition-colors">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                            <span class="text-sm font-medium">G</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium">General</h4>
+                            <p class="text-xs text-gray-400">128 members</p>
+                        </div>
+                    </div>
+                    <div class="w-2 h-2 bg-red-400 rounded-full"></div>
+                </div>
+            </div>
+            
+            <div class="text-gray-300 hover:bg-gray-700 p-3 rounded-lg cursor-pointer transition-colors">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center">
+                            <span class="text-sm font-medium">R</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium">Random</h4>
+                            <p class="text-xs text-gray-400">89 members</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-gray-300 hover:bg-gray-700 p-3 rounded-lg cursor-pointer transition-colors">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+                            <span class="text-sm font-medium">A</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium">Announcements</h4>
+                            <p class="text-xs text-gray-400">567 members</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="p-4 border-t border-gray-700">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                <span class="text-sm font-medium text-white">{{ user.username|first|upper }}</span>
+            </div>
+            <div class="flex-1">
+                <p class="text-white font-medium text-sm">{{ user.username|default:"Anonymous" }}</p>
+                <p class="text-gray-400 text-xs">Online</p>
+            </div>
+            <button class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
