@@ -1,16 +1,25 @@
-<h2 class="text-xl font-semibold mb-4">Create Group</h2>
-<form method="POST" action="{% url "create_group" %}" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <div class="flex justify-end gap-2 mt-4">
-    <button type="button" 
-            onclick="document.getElementById('modal-container').innerHTML = ''" 
-            class="bg-gray-200 px-4 py-2 rounded">
-      Cancel
-    </button>
-    <button type="submit" 
-            class="bg-blue-600 text-white px-4 py-2 rounded">
-      Submit
-    </button>
-  </div>
-</form>
+<!-- r_chat/partials/group_form_modal.html -->
+<div class="modal bg-gray-800 p-6 rounded-lg">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-4">
+            {{ group_form.group_name.label_tag }}
+            {{ group_form.group_name }}
+            {% if group_form.group_name.errors %}
+                <p class="text-red-500 text-sm">{{ group_form.group_name.errors }}</p>
+            {% endif %}
+        </div>
+        <div class="mb-4">
+            {{ group_form.picture.label_tag }}
+            {{ group_form.picture }}
+        </div>
+        <h3 class="text-white font-semibold mt-4 mb-2">Add Friends</h3>
+        <div class="mb-4">
+            {{ group_form.friends }}
+            {% if group_form.friends.errors %}
+                <p class="text-red-500 text-sm">{{ group_form.friends.errors }}</p>
+            {% endif %}
+        </div>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Create Group</button>
+    </form>
+</div>

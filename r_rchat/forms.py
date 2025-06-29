@@ -1,6 +1,7 @@
-# r_rchat/forms.py
+# r_chat/forms.py
 from django import forms
 from .models import ChatGroup, GroupMessage
+from django.contrib.auth.models import User
 
 class CreateMessage(forms.ModelForm):
     class Meta:
@@ -16,9 +17,18 @@ class CreateMessage(forms.ModelForm):
         }
 
 class CreateGroup(forms.ModelForm):
+    friends = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={
+            'class': 'text-gray-400',
+        }),
+        required=False,
+        label="Add Friends to Group"
+    )
+
     class Meta:
         model = ChatGroup
-        fields = ['group_name', 'picture']
+        fields = ['group_name', 'picture', 'friends']
         widgets = {
             'group_name': forms.TextInput(attrs={
                 'class': 'w-full bg-gray-800 text-white p-2 rounded-lg mb-2',
@@ -29,6 +39,14 @@ class CreateGroup(forms.ModelForm):
                 'class': 'w-full text-gray-400 p-2 rounded-lg',
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['friends'].queryset = User.objects.filter(
+                id__in=user.friendships_sent.values_list('to_user', flat=True)
+            )
 
     def clean_group_name(self):
         group_name = self.cleaned_data['group_name']

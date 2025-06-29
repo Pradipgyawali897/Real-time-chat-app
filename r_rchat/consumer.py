@@ -3,8 +3,8 @@ from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
-from django.db import transaction
 from .models import ChatGroup, GroupMessage
+from django.db import transaction
 
 class ChatRoomConsumer(WebsocketConsumer):
 
@@ -67,16 +67,11 @@ class ChatRoomConsumer(WebsocketConsumer):
             )
             print(f"Created message: {message}")
 
-            html = render_to_string("r_chat/chat_message.html", {
-                'message': message,
-                'user': self.user,
-                'chat_group': self.chat_group,
-            })
             async_to_sync(self.channel_layer.group_send)(
                 self.group_name,
                 {
                     'type': 'chat_message',
-                    'html': html,
+                    'message_id': message.id,
                 }
             )
         except json.JSONDecodeError as e:
@@ -88,68 +83,56 @@ class ChatRoomConsumer(WebsocketConsumer):
 
     def chat_message(self, event):
         try:
-            self.send(text_data=event['html'])
-            print(f"Sent chat message to {self.user}")
+            message_id = event['message_id']
+            message = GroupMessage.objects.get(id=message_id)
+            html = render_to_string("r_chat/partials/chat_messages_p.html", {
+                'message': message,
+                'user': self.user,
+                'chat_group': self.chat_group,
+            })
+            self.send(text_data=html)
+            print(f"Sent chat message {message_id} to {self.user}")
+        except GroupMessage.DoesNotExist:
+            print(f"Message with ID {event['message_id']} does not exist")
         except Exception as e:
             print(f"Chat message error: {e}")
 
     def send_online_users(self):
-        try:
-            online_users = self.chat_group.online_users.all()
-            print(f"Sending online users: {list(online_users)}")
-            html = render_to_string("r_chat/partials/online_users.html", {
-                "users": online_users
-            })
-            print(f"Online users HTML: {html[:100]}...")
-            async_to_sync(self.channel_layer.group_send)(
-                self.group_name,
-                {
-                    'type': 'online_users',
-                    'html': html,
-                    'hx_target': '#online-users-container',
-                    'hx_swap': 'innerHTML'
-                }
-            )
-        except Exception as e:
-            print(f"Error sending online users: {e}")
+        online_users = self.chat_group.online_users.all()
+        print(f"Sending online users: {list(online_users)}")
+        html = render_to_string("r_chat/partials/online_users.html", {
+            "users": online_users
+        })
+        print(f"Online users HTML: {html[:100]}...")  # Truncate for logging
+        async_to_sync(self.channel_layer.group_send)(
+            self.group_name,
+            {
+                'type': 'online_users',
+                'html': html
+            }
+        )
 
     def send_online_count(self):
-        try:
-            count = self.chat_group.online_users.count()
-            print(f"Sending online count: {count}")
-            html = render_to_string("r_chat/partials/online_count.html", {
-                'online_count': count
-            })
-            async_to_sync(self.channel_layer.group_send)(
-                self.group_name,
-                {
-                    'type': 'online_count',
-                    'html': html,
-                    'hx_target': '#online-count-container',
-                    'hx_swap': 'innerHTML'
-                }
-            )
-        except Exception as e:
-            print(f"Error sending online count: {e}")
+        count = self.chat_group.online_users.count()
+        print(f"Sending online count: {count}")
+        async_to_sync(self.channel_layer.group_send)(
+            self.group_name,
+            {
+                'type': 'online_count',
+                'count': count
+            }
+        )
 
     def online_count(self, event):
         try:
-            self.send(text_data=json.dumps({
-                'html': event['html'],
-                'hx_target': event['hx_target'],
-                'hx_swap': event['hx_swap']
-            }))
-            print(f"Sent online count to {self.user}")
+            html = render_to_string("r_chat/partials/online_count.html", {
+                'online_count': event['count']
+            })
+            self.send(text_data=html)
+            print(f"Sent online count {event['count']} to {self.user}")
         except Exception as e:
             print(f"Online count error: {e}")
 
     def online_users(self, event):
-        try:
-            self.send(text_data=json.dumps({
-                'html': event['html'],
-                'hx_target': event['hx_target'],
-                'hx_swap': event['hx_swap']
-            }))
-            print(f"Sent online users HTML to {self.user}")
-        except Exception as e:
-            print(f"Online users error: {e}")
+        self.send(text_data=event['html'])
+        print(f"Sent online users HTML to {self.user}")

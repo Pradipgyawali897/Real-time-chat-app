@@ -63,7 +63,7 @@
     
     <!-- Right Sidebar - Online Users -->
     <div id="online-users-container" class="w-64 min-w-[16rem] bg-gray-800 border-l border-gray-700 flex flex-col">
-        {% include "r_chat/partials/online_users.html" with users=group.online_users.all %}
+        {% include "r_chat/partials/online_users.html" with users=group.online_users.all|default:public_chat.online_users.all %}
     </div>
 </div>
 {% endblock %}
@@ -78,9 +78,21 @@
     }
     scrollToBottom();
 
-    // Auto-scroll on new messages
+    // Handle HTMX WebSocket messages
     document.addEventListener('htmx:wsAfterMessage', function(event) {
-        console.log('HTMX WebSocket message:', event.detail.message);
+        const message = event.detail.message;
+        console.log('HTMX WebSocket message:', message);
+        try {
+            const data = JSON.parse(message);
+            if (data.html && data.hx_target && data.hx_swap) {
+                const target = document.querySelector(data.hx_target);
+                if (target && data.hx_swap === 'innerHTML') {
+                    target.innerHTML = data.html;
+                }
+            }
+        } catch (e) {
+            console.error('Error parsing WebSocket message:', e);
+        }
         scrollToBottom(100);
     });
 
@@ -98,4 +110,4 @@
         }
     });
 </script>
-{% endblock %}
+{% endblock %}  
