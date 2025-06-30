@@ -15,12 +15,15 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+from dotenv import load_dotenv
+import os
 
+load_dotenv() 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rj#-z^kx3j+1ay397otg6j8m_8#v^$^$jys6&41vy^&6le)ezc'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -91,29 +94,33 @@ TEMPLATES = [
 
 ASGI_APPLICATION = 'a_core.asgi.application'
 
+# CHANNEL_LAYERS = {
+#         'default': {
+#             "BACKEND": "channels.layers.InMemoryChannelLayer",
+#         }
+#   }
+import os
+
+RREDIS_LOCAL = "redis://localhost:6379"
+REDIS_PROD = os.environ.get("REDIS_URL")
+
+REDIS_URL = RREDIS_LOCAL if DEBUG else REDIS_PROD
+
 CHANNEL_LAYERS = {
-        'default': {
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
-        }
-  }
-# # CHANNEL_LAYERS = {
-# #     "default": {
-# #         "BACKEND": "channels_redis.core.RedisChannelLayer",
-# #         "CONFIG": {
-# #             "hosts": [('redis://default:ivMeWFCKbrBsOCqiIxPuwFuvkyjpaEbe@redis.railway.internal:6379')],
-# #         },
-# #     },
-# # }
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [REDIS_URL],
+        },
+    },
+}
+
+
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+
 
 
 # Password validation
@@ -162,3 +169,35 @@ LOGIN_REDIRECT_URL = '/'
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_LOGIN_METHODS = {'email'}
+
+import dj_database_url
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=30,
+            conn_health_checks=True,
+        )
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+ADMINS = [("Pradip", "mygreatkart@gmail.com")]
+MANAGERS = ADMINS
+

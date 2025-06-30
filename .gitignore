@@ -8,3 +8,4 @@ migrations
 venv
 __pycache__
 venv
+staticfiles

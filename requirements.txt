@@ -5,3 +5,7 @@ django-allauth
 django-htmx
 channels[daphne]
 channels-redis
+dotenv
+dj-database-url
+psycopg[binary]
+whitenoise

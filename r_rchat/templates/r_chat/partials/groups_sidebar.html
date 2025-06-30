@@ -21,24 +21,7 @@
         <div x-show="showGroupForm" x-transition class="mt-4">
             <form action="{% url 'create_group' %}" method=" " enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="mb-4">
-                    {{ group_form.group_name.label_tag }}
-                    {{ group_form.group_name }}
-                    {% if group_form.group_name.errors %}
-                        <p class="text-red-400 text-xs">{{ group_form.group_name.errors }}</p>
-                    {% endif %}
-                </div>
-                <div class="mb-4">
-                    {{ group_form.picture.label_tag }}
-                    {{ group_form.picture }}
-                </div>
-                <h4 class="text-white font-medium text-sm mb-2">Add Friends</h4>
-                <div class="mb-4">
-                    {{ group_form.friends }}
-                    {% if group_form.friends.errors %}
-                        <p class="text-red-400 text-xs">{{ group_form.friends.errors }}</p>
-                    {% endif %}
-                </div>
+                
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium">Create Group</button>
             </form>
         </div>
@@ -185,7 +168,7 @@ function loadFriends() {
                         <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
                             <span class="text-sm font-medium">${friend.username.charAt(0).toUpperCase()}</span>
                         </div>
-                        <div>
+                        <div>   
                             <h4 class="font-medium">${friend.username}</h4>
                             <p class="text-xs text-gray-400">${friend.is_online ? 'Online' : 'Offline'}</p>
                         </div>
